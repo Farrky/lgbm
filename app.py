@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import lightgbm as lgb
+import shap
 
 # =========================================================
 # KONFIGURASI HALAMAN
@@ -45,6 +46,16 @@ except (FileNotFoundError, lgb.basic.LightGBMError) as e:
         f"Detail error: {e}"
     )
     st.stop()
+
+
+@st.cache_resource
+def get_shap_explainer(_model):
+    # TreeExplainer untuk model berbasis pohon (LightGBM) tidak wajib
+    # membutuhkan data latar belakang, jadi cukup dibuat sekali dari model
+    return shap.TreeExplainer(_model)
+
+
+explainer = get_shap_explainer(model)
 
 
 # =========================================================
@@ -130,6 +141,83 @@ def halaman_prediksi():
         st.write("Probabilitas untuk tiap kelas:")
         st.bar_chart(proba_df.set_index("Kelas"))
         st.dataframe(proba_df, use_container_width=True, hide_index=True)
+
+        # =========================================================
+        # SHAP: kenapa model memprediksi kelas ini untuk input tersebut
+        # =========================================================
+        st.divider()
+        st.subheader("Kenapa Model Memprediksi Ini? (SHAP)")
+
+        shap_values = explainer.shap_values(data_np)
+
+        # Format output shap berbeda antar versi library:
+        # - versi lama -> list berisi 1 array per kelas
+        # - versi baru -> 1 array 3D (baris, fitur, kelas)
+        if isinstance(shap_values, list):
+            shap_kelas = shap_values[pred_encoded][0]
+        else:
+            shap_kelas = shap_values[0, :, pred_encoded]
+
+        shap_df = pd.DataFrame({
+            "Fitur": feature_columns,
+            "Kontribusi SHAP": shap_kelas
+        }).sort_values("Kontribusi SHAP", key=abs, ascending=False)
+
+        st.caption(
+            f"Kontribusi tiap fitur terhadap prediksi kelas **{pred_label}** untuk data yang kamu "
+            "masukkan. Nilai positif mendorong prediksi ke arah kelas ini, nilai negatif menariknya menjauh."
+        )
+        st.bar_chart(shap_df.set_index("Fitur"))
+        st.dataframe(shap_df, use_container_width=True, hide_index=True)
+
+        # =========================================================
+        # ANALISIS SENSITIVITAS FITUR (PDP sederhana, per-individu)
+        # =========================================================
+        st.divider()
+        st.subheader("Analisis Sensitivitas Fitur")
+        st.caption(
+            "Lihat bagaimana probabilitas prediksi berubah jika satu fitur diubah-ubah, "
+            "sementara semua fitur lain tetap sama seperti input di atas."
+        )
+
+        fitur_numerik_range = {
+            "Usia": (1, 120),
+            "Frekuensi_Makan_Sayur": (1.0, 3.0),
+            "Jumlah_Makan_Utama": (1.0, 4.0),
+            "Konsumsi_Air_Putih": (1.0, 3.0),
+            "Frekuensi_Olahraga": (0.0, 3.0),
+            "Durasi_Layar_Gadget": (0.0, 2.0),
+        }
+
+        fitur_dipilih = st.selectbox(
+            "Pilih fitur yang ingin diuji sensitivitasnya",
+            list(fitur_numerik_range.keys()),
+            key="fitur_sensitivitas"
+        )
+
+        nilai_min, nilai_max = fitur_numerik_range[fitur_dipilih]
+        rentang_nilai = np.linspace(nilai_min, nilai_max, 20)
+
+        hasil_sensitivitas = []
+        for nilai in rentang_nilai:
+            df_variasi = df_input.copy()
+            df_variasi[fitur_dipilih] = nilai
+            df_variasi_scaled = pd.DataFrame(
+                scaler.transform(df_variasi), columns=df_variasi.columns
+            )
+            data_variasi_np = np.ascontiguousarray(df_variasi_scaled.values, dtype=np.float64)
+            proba_variasi = model.predict(data_variasi_np)[0]
+            hasil_sensitivitas.append({
+                fitur_dipilih: round(float(nilai), 2),
+                f"Probabilitas '{pred_label}'": proba_variasi[pred_encoded]
+            })
+
+        df_sensitivitas = pd.DataFrame(hasil_sensitivitas)
+        st.line_chart(df_sensitivitas.set_index(fitur_dipilih))
+        st.caption(
+            f"Garis di atas menunjukkan probabilitas kelas **{pred_label}** seiring **{fitur_dipilih.replace('_', ' ')}** "
+            "berubah, dengan semua fitur lain tetap seperti input kamu."
+        )
 
 
 # =========================================================
