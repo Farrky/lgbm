@@ -64,21 +64,21 @@ def halaman_prediksi():
                 "Usia", min_value=1, max_value=120, value=25, step=1
             )
             user_input["Frekuensi_Makan_Sayur"] = st.slider(
-                "Frekuensi Makan Sayur (1 = jarang, 3 = sering)", 1, 3, 2, 1
+                "Frekuensi Makan Sayur (1 = jarang, 10 = sangat sering)", 1, 10, 2, 1
             )
             user_input["Jumlah_Makan_Utama"] = st.slider(
-                "Jumlah Makan Utama per Hari", 1, 4, 3, 1
+                "Jumlah Makan Utama per Hari", 1, 10, 3, 1
             )
 
         with col2:
             user_input["Konsumsi_Air_Putih"] = st.slider(
-                "Konsumsi Air Putih per Hari (liter)", 1, 3, 2, 1
+                "Konsumsi Air Putih per Hari (liter)", 1, 10, 2, 1
             )
             user_input["Frekuensi_Olahraga"] = st.slider(
-                "Frekuensi Olahraga per Minggu (0 = tidak pernah, 3 = sering)", 0, 3, 1, 1
+                "Frekuensi Olahraga per Minggu (0 = tidak pernah, 10 = sangat sering)", 0, 10, 1, 1
             )
             user_input["Durasi_Layar_Gadget"] = st.slider(
-                "Durasi Pemakaian Gadget per Hari (0 = rendah, 2 = tinggi)", 0, 2, 1, 1
+                "Durasi Pemakaian Gadget per Hari (0 = rendah, 10 = sangat tinggi)", 0, 10, 1, 1
             )
 
         st.markdown("---")
