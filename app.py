@@ -64,7 +64,7 @@ def halaman_prediksi():
                 "Usia", min_value=1, max_value=120, value=25, step=1
             )
             user_input["Frekuensi_Makan_Sayur"] = st.number_input(
-                "Frekuensi Makan Sayur (1 = jarang, 3 = sering)", min_value=0, value=2, step=1
+                "Frekuensi Makan Sayur ", min_value=0, value=2, step=1
             )
             user_input["Jumlah_Makan_Utama"] = st.number_input(
                 "Jumlah Makan Utama per Hari", min_value=0, value=3, step=1
@@ -75,10 +75,10 @@ def halaman_prediksi():
                 "Konsumsi Air Putih per Hari (liter)", min_value=0, value=2, step=1
             )
             user_input["Frekuensi_Olahraga"] = st.number_input(
-                "Frekuensi Olahraga per Minggu (0 = tidak pernah, 3 = sering)", min_value=0, value=1, step=1
+                "Frekuensi Olahraga per Minggu ", min_value=0, value=1, step=1
             )
             user_input["Durasi_Layar_Gadget"] = st.number_input(
-                "Durasi Pemakaian Gadget per Hari (0 = rendah, 2 = tinggi)", min_value=0, value=1, step=1
+                "Durasi Pemakaian Gadget per Hari ", min_value=0, value=1, step=1
             )
 
         st.markdown("---")
