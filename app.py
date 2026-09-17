@@ -63,22 +63,22 @@ def halaman_prediksi():
             user_input["Usia"] = st.number_input(
                 "Usia", min_value=1, max_value=120, value=25, step=1
             )
-            user_input["Frekuensi_Makan_Sayur"] = st.slider(
-                "Frekuensi Makan Sayur (1 = jarang, 10 = sangat sering)", 1, 10, 2, 1
+            user_input["Frekuensi_Makan_Sayur"] = st.number_input(
+                "Frekuensi Makan Sayur (1 = jarang, 3 = sering)", min_value=0, value=2, step=1
             )
-            user_input["Jumlah_Makan_Utama"] = st.slider(
-                "Jumlah Makan Utama per Hari", 1, 10, 3, 1
+            user_input["Jumlah_Makan_Utama"] = st.number_input(
+                "Jumlah Makan Utama per Hari", min_value=0, value=3, step=1
             )
 
         with col2:
-            user_input["Konsumsi_Air_Putih"] = st.slider(
-                "Konsumsi Air Putih per Hari (liter)", 1, 10, 2, 1
+            user_input["Konsumsi_Air_Putih"] = st.number_input(
+                "Konsumsi Air Putih per Hari (liter)", min_value=0, value=2, step=1
             )
-            user_input["Frekuensi_Olahraga"] = st.slider(
-                "Frekuensi Olahraga per Minggu (0 = tidak pernah, 10 = sangat sering)", 0, 10, 1, 1
+            user_input["Frekuensi_Olahraga"] = st.number_input(
+                "Frekuensi Olahraga per Minggu (0 = tidak pernah, 3 = sering)", min_value=0, value=1, step=1
             )
-            user_input["Durasi_Layar_Gadget"] = st.slider(
-                "Durasi Pemakaian Gadget per Hari (0 = rendah, 10 = sangat tinggi)", 0, 10, 1, 1
+            user_input["Durasi_Layar_Gadget"] = st.number_input(
+                "Durasi Pemakaian Gadget per Hari (0 = rendah, 2 = tinggi)", min_value=0, value=1, step=1
             )
 
         st.markdown("---")
